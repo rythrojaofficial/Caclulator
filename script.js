@@ -77,7 +77,7 @@ function product (a,b){
     return Number(a) * Number(b);
 }
 function quotient (a,b){
-    if (b === 0) return 'ERROR, cannot divide by 0';
+    if (b == 0) return `ERROR, cannot divide by 0`;
     else{ return Number(a) / Number(b)};
 }
 // operations
