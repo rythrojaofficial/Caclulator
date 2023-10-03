@@ -43,7 +43,9 @@ const parenthesisButton = document.querySelector('#parenthesis');
 const dotButton = document.querySelector('#dot');
     dotButton.addEventListener('click', () => addInput('.'));
 const clearButton = document.querySelector('#ac');
-    clearButton.addEventListener('click', ()=> inputDisplay.innerText = "")
+    clearButton.addEventListener('click', ()=> {
+        inputDisplay.innerText = "";
+        calculationDisplay.innerText = "";});
 const equalsButton = document.querySelector('#equals');
     equalsButton.addEventListener('click', calculate);
         
@@ -57,7 +59,6 @@ function addInput(e) {
         console.log ('error');
     else{
         inputDisplay.innerText = `${inputDisplay.innerText}${e}`;
-    console.log(inputDisplay);
     }
 
     
