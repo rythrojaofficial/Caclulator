@@ -5,7 +5,6 @@ const inputDisplay = document.querySelector('#user-input-display');
 const calculationDisplay = document.querySelector('#calculation-display');
 
 
-
 // numbers 
 const oneButton = document.querySelector('#one');
     oneButton.addEventListener('click', () => addInput(1));
@@ -30,18 +29,25 @@ const zeroButton = document.querySelector('#zero');
 
 //operators
 const deleteButton = document.querySelector('#del');
+    deleteButton.addEventListener('click', ()=> del(inputDisplay.innerText))
 const percentButton = document.querySelector('#percent');
+
+//main operators
 const divideButton = document.querySelector('#divide');
-    divideButton.addEventListener('click', () => addInput('÷'));
+    divideButton.addEventListener('click', () => operation('÷'));
 const multiplyButton = document.querySelector('#multiply');
-    multiplyButton.addEventListener('click', () => addInput('x'));
+    multiplyButton.addEventListener('click', () => operation('x'));
 const subtractButton = document.querySelector('#subtract');
-    subtractButton.addEventListener('click', () => addInput('-'));
+    subtractButton.addEventListener('click', () => operation('-'));
 const addButton = document.querySelector('#add');
-    addButton.addEventListener('click', () => addInput('+'));
+    addButton.addEventListener('click', ()=> operation('+'));
+
+
 const parenthesisButton = document.querySelector('#parenthesis');
 const dotButton = document.querySelector('#dot');
     dotButton.addEventListener('click', () => addInput('.'));
+
+
 const clearButton = document.querySelector('#ac');
     clearButton.addEventListener('click', ()=> {
         inputDisplay.innerText = "";
@@ -50,9 +56,37 @@ const equalsButton = document.querySelector('#equals');
     equalsButton.addEventListener('click', calculate);
         
 
+// calculations 
+function round2places(num){
+    return Math.round(num*100)/100;
+}
 
+function sum(a, b){
+    let theSum = Number(a) + Number(b);
+    return round2places(theSum)
+        
+        
+}
+function difference(a, b){
+    let theDifference = Number(a) - Number(b);
+    return round2places(theDifference);
+}
 
-
+function product (a,b){
+    let theProduct = Number(a) * Number(b);
+    return round2places(theProduct);
+}
+function quotient (a,b){
+    if (b == 0) return `ERROR, cannot divide by 0`;
+    else{ let theQuotient = Number(a) / Number(b);
+        return round2places(theQuotient);
+}
+}
+// operations
+function operation(e){
+    checkOperator(e);
+    addInput(e);
+}
 
 function addInput(e) {
     if(inputDisplay.innerText.length > 25)
@@ -60,27 +94,21 @@ function addInput(e) {
     else{
         inputDisplay.innerText = `${inputDisplay.innerText}${e}`;
     }
-
+}
     
-}
 
+function checkOperator(operation){
+    if(inputDisplay.innerText.includes('+')){
+        calculate(inputDisplay.innerText.includes(operation));
+    }else if(inputDisplay.innerText.includes('-')){
+        calculate(inputDisplay.innerText.includes(operation));
+    }else if(inputDisplay.innerText.includes('x')){
+        calculate(inputDisplay.innerText.includes(operation));
+    }else if(inputDisplay.innerText.includes('÷')){
+        calculate(inputDisplay.innerText.includes(operation));
+    }
+    }
 
-// calculations 
-function sum(a, b){
-    return Number(a) + Number(b);
-}
-function difference(a, b){
-    return Number(a) - Number(b);
-}
-
-function product (a,b){
-    return Number(a) * Number(b);
-}
-function quotient (a,b){
-    if (b == 0) return `ERROR, cannot divide by 0`;
-    else{ return Number(a) / Number(b)};
-}
-// operations
 function calculate(){
     if (inputDisplay.innerText.length < 1) {
         console.log('no expression');
@@ -91,25 +119,36 @@ function calculate(){
     if (expression.includes('x')){
         let aExpression = expression.slice(0,expression.indexOf('x'));
         let bExpression = expression.slice(expression.indexOf('x')+1);
-        calculationDisplay.innerText = product(aExpression,bExpression);
+        inputDisplay.innerText = product(aExpression,bExpression);
         return;
     }
     if (expression.includes('÷')){
         let aExpression = expression.slice(0,expression.indexOf('÷'));
         let bExpression = expression.slice(expression.indexOf('÷')+1);
-        calculationDisplay.innerText = quotient(aExpression,bExpression);
+        inputDisplay.innerText = quotient(aExpression,bExpression);
         return;
     }
     if (expression.includes('-')){
         let aExpression = expression.slice(0,expression.indexOf('-'));
         let bExpression = expression.slice(expression.indexOf('-')+1);
-        calculationDisplay.innerText = difference(aExpression,bExpression);
+        inputDisplay.innerText = difference(aExpression,bExpression);
         return;
     }
     if (expression.includes('+')){
         let aExpression = expression.slice(0,expression.indexOf('+'));
         let bExpression = expression.slice(expression.indexOf('+')+1);
-        calculationDisplay.innerText = sum(aExpression,bExpression);
+        inputDisplay.innerText = sum(aExpression,bExpression);
         return;
     }
 }
+
+//special operations
+function del(string){
+    inputDisplay.innerText = string.slice(0, -1);
+    return;
+}
+
+
+
+
+
