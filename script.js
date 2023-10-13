@@ -3,6 +3,7 @@
 // displays 
 const inputDisplay = document.querySelector('#user-input-display');
 const calculationDisplay = document.querySelector('#calculation-display');
+const operators = '/+|-|x|÷/';
 
 
 // numbers 
@@ -31,6 +32,7 @@ const zeroButton = document.querySelector('#zero');
 const deleteButton = document.querySelector('#del');
     deleteButton.addEventListener('click', ()=> del(inputDisplay.innerText))
 const percentButton = document.querySelector('#percent');
+    percentButton.addEventListener('click', percent);
 
 //main operators
 const divideButton = document.querySelector('#divide');
@@ -45,12 +47,15 @@ const addButton = document.querySelector('#add');
 
 const parenthesisButton = document.querySelector('#parenthesis');
 const dotButton = document.querySelector('#dot');
-    dotButton.addEventListener('click', () => addInput('.'));
+    dotButton.addEventListener('click', () => {
+        if (!inputDisplay.innerText.includes('.'))
+        addInput('.')
+    });
 
 
 const clearButton = document.querySelector('#ac');
     clearButton.addEventListener('click', ()=> {
-        inputDisplay.innerText = "";
+        inputDisplay.innerText = "0";
         calculationDisplay.innerText = "";});
 const equalsButton = document.querySelector('#equals');
     equalsButton.addEventListener('click', calculate);
@@ -77,7 +82,7 @@ function product (a,b){
     return round2places(theProduct);
 }
 function quotient (a,b){
-    if (b == 0) return `ERROR, cannot divide by 0`;
+    if (b == 0) return `ERROR, divide by zero`;
     else{ let theQuotient = Number(a) / Number(b);
         return round2places(theQuotient);
 }
@@ -113,30 +118,37 @@ function calculate(){
     if (inputDisplay.innerText.length < 1) {
         console.log('no expression');
         return};
+
+    let aExpression;
+    let bExpression;
+
+    
             
-        let expression = inputDisplay.innerText;
+        
+    let expression = inputDisplay.innerText;
 
     if (expression.includes('x')){
-        let aExpression = expression.slice(0,expression.indexOf('x'));
-        let bExpression = expression.slice(expression.indexOf('x')+1);
+        aExpression = expression.slice(0,expression.indexOf('x'));
+        bExpression = expression.slice(expression.indexOf('x')+1);
         inputDisplay.innerText = product(aExpression,bExpression);
         return;
     }
     if (expression.includes('÷')){
-        let aExpression = expression.slice(0,expression.indexOf('÷'));
-        let bExpression = expression.slice(expression.indexOf('÷')+1);
+        aExpression = expression.slice(0,expression.indexOf('÷'));
+        bExpression = expression.slice(expression.indexOf('÷')+1);
         inputDisplay.innerText = quotient(aExpression,bExpression);
         return;
     }
-    if (expression.includes('-')){
-        let aExpression = expression.slice(0,expression.indexOf('-'));
-        let bExpression = expression.slice(expression.indexOf('-')+1);
+    if (expression.includes('-') && expression.charAt(0) !== '-'){
+        aExpression = expression.slice(0,expression.indexOf('-'));
+        bExpression = expression.slice(expression.indexOf('-')+1);
         inputDisplay.innerText = difference(aExpression,bExpression);
         return;
     }
+    
     if (expression.includes('+')){
-        let aExpression = expression.slice(0,expression.indexOf('+'));
-        let bExpression = expression.slice(expression.indexOf('+')+1);
+        aExpression = expression.slice(0,expression.indexOf('+'));
+        bExpression = expression.slice(expression.indexOf('+')+1);
         inputDisplay.innerText = sum(aExpression,bExpression);
         return;
     }
@@ -147,6 +159,14 @@ function del(string){
     inputDisplay.innerText = string.slice(0, -1);
     return;
 }
+function percent(){
+    if (inputDisplay.innerHTML !== ""
+        && !inputDisplay.innerHTML.includes('/+|-|x|÷/')){
+        addInput('÷100'); 
+        }
+         
+    }
+
 
 
 
