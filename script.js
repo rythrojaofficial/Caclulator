@@ -3,8 +3,19 @@
 // displays 
 const inputDisplay = document.querySelector('#user-input-display');
 const calculationDisplay = document.querySelector('#calculation-display');
-const operators = '/+|-|x|÷/';
 
+// operations
+let currentOperator;
+let aExpression;
+let bExpression;
+let firstChar;
+
+const plus = '+';
+const minus = '-';
+const times = 'x';
+const dividedBy = '÷'; 
+const ops = '[/+]|x|-|÷';
+const zeroErrorMessage = `ERROR, divide by zero`;
 
 // numbers 
 const oneButton = document.querySelector('#one');
@@ -28,130 +39,154 @@ const nineButton = document.querySelector('#nine');
 const zeroButton = document.querySelector('#zero');
     zeroButton.addEventListener('click', () => addInput(0));
 
-//operators
+//other function buttons
 const deleteButton = document.querySelector('#del');
     deleteButton.addEventListener('click', ()=> del(inputDisplay.innerText))
 const percentButton = document.querySelector('#percent');
-    percentButton.addEventListener('click', percent);
-
-//main operators
-const divideButton = document.querySelector('#divide');
-    divideButton.addEventListener('click', () => operation('÷'));
-const multiplyButton = document.querySelector('#multiply');
-    multiplyButton.addEventListener('click', () => operation('x'));
-const subtractButton = document.querySelector('#subtract');
-    subtractButton.addEventListener('click', () => operation('-'));
-const addButton = document.querySelector('#add');
-    addButton.addEventListener('click', ()=> operation('+'));
-
+    percentButton.addEventListener('click', ()=> operation('%'));
+    
+const clearButton = document.querySelector('#ac');
+    clearButton.addEventListener('click', ()=> {
+        inputDisplay.innerText = "";
+        calculationDisplay.innerText = "";
+        aExpression = 0;
+        bExpression = 0;
+        currentOperator = undefined;
+    })
+const equalsButton = document.querySelector('#equals');
+    equalsButton.addEventListener('click', calculate);
 
 const parenthesisButton = document.querySelector('#parenthesis');
 const dotButton = document.querySelector('#dot');
     dotButton.addEventListener('click', () => {
-        if (!inputDisplay.innerText.includes('.'))
         addInput('.')
     });
 
+//main operation buttons
+const divideButton = document.querySelector('#divide');
+    divideButton.addEventListener('click', () => operation(dividedBy));
+const multiplyButton = document.querySelector('#multiply');
+    multiplyButton.addEventListener('click', () => operation(times));
+const subtractButton = document.querySelector('#subtract');
+    subtractButton.addEventListener('click', () => operation(minus));
+const addButton = document.querySelector('#add');
+    addButton.addEventListener('click', ()=> operation(plus));
 
-const clearButton = document.querySelector('#ac');
-    clearButton.addEventListener('click', ()=> {
-        inputDisplay.innerText = "0";
-        calculationDisplay.innerText = "";});
-const equalsButton = document.querySelector('#equals');
-    equalsButton.addEventListener('click', calculate);
+
+
+
+
         
 
 // calculations 
-function round2places(num){
-    return Math.round(num*100)/100;
+function round(num){
+    return Math.round(num*1000)/1000;
 }
 
 function sum(a, b){
     let theSum = Number(a) + Number(b);
-    return round2places(theSum)
+    return round(theSum)
         
         
 }
 function difference(a, b){
     let theDifference = Number(a) - Number(b);
-    return round2places(theDifference);
+    return round(theDifference);
 }
 
 function product (a,b){
     let theProduct = Number(a) * Number(b);
-    return round2places(theProduct);
+    return round(theProduct);
 }
 function quotient (a,b){
-    if (b == 0) return `ERROR, divide by zero`;
+    if (b === '0') return zeroErrorMessage;
+    
     else{ let theQuotient = Number(a) / Number(b);
-        return round2places(theQuotient);
+        return round(theQuotient);
 }
 }
-// operations
+
+
 function operation(e){
-    checkOperator(e);
+    // evaluate last function, if any 
+    calculate();
+    // reassign new operation if any 
+    currentOperator = e;
     addInput(e);
 }
 
 function addInput(e) {
     if(inputDisplay.innerText.length > 25)
         console.log ('error');
+    // if ((e === '%' 
+    //     && (inputDisplay.innerHTML !== ""
+    //     || !inputDisplay.innerHTML.includes('/+|-|x|÷|%/'))
+    //     )){
+    //         console.log('percent time')
+    //     return;
+    // }
     else{
         inputDisplay.innerText = `${inputDisplay.innerText}${e}`;
     }
 }
-    
 
-function checkOperator(operation){
-    if(inputDisplay.innerText.includes('+')){
-        calculate(inputDisplay.innerText.includes(operation));
-    }else if(inputDisplay.innerText.includes('-')){
-        calculate(inputDisplay.innerText.includes(operation));
-    }else if(inputDisplay.innerText.includes('x')){
-        calculate(inputDisplay.innerText.includes(operation));
-    }else if(inputDisplay.innerText.includes('÷')){
-        calculate(inputDisplay.innerText.includes(operation));
-    }
-    }
+    
 
 function calculate(){
+    const operatorPosition = [];
     if (inputDisplay.innerText.length < 1) {
-        console.log('no expression');
         return};
-
-    let aExpression;
-    let bExpression;
-
     
-            
-        
-    let expression = inputDisplay.innerText;
-
-    if (expression.includes('x')){
-        aExpression = expression.slice(0,expression.indexOf('x'));
-        bExpression = expression.slice(expression.indexOf('x')+1);
-        inputDisplay.innerText = product(aExpression,bExpression);
-        return;
-    }
-    if (expression.includes('÷')){
-        aExpression = expression.slice(0,expression.indexOf('÷'));
-        bExpression = expression.slice(expression.indexOf('÷')+1);
-        inputDisplay.innerText = quotient(aExpression,bExpression);
-        return;
-    }
-    if (expression.includes('-') && expression.charAt(0) !== '-'){
-        aExpression = expression.slice(0,expression.indexOf('-'));
-        bExpression = expression.slice(expression.indexOf('-')+1);
-        inputDisplay.innerText = difference(aExpression,bExpression);
-        return;
-    }
+    if (currentOperator === '%'){
+            inputDisplay.innerText = product(inputDisplay.innerText.slice(0,-1), 0.01);
+            return;
+        }
+    assignExpressions(inputDisplay.innerText);
     
-    if (expression.includes('+')){
-        aExpression = expression.slice(0,expression.indexOf('+'));
-        bExpression = expression.slice(expression.indexOf('+')+1);
+    if (currentOperator === minus){
+        inputDisplay.innerText = difference(aExpression, bExpression);
+        return;
+    }
+    if (currentOperator === plus){
         inputDisplay.innerText = sum(aExpression,bExpression);
         return;
     }
+    if (currentOperator === dividedBy){
+        inputDisplay.innerText = quotient(aExpression,bExpression);
+        return;
+    }
+    if (currentOperator === times){
+        inputDisplay.innerText = product(aExpression,bExpression);
+        return;
+    }
+    
+}
+
+function assignExpressions(fullExpression){
+    // create an array that matches operators in the expresssion and maps their indexes 
+    operatorPosition = [...fullExpression.matchAll(ops)].map(a => a.index);
+    let firstChar = fullExpression.slice(0,1);
+
+    // case of only negative number, single operand
+    if (operatorPosition[0] === 0  && operatorPosition.length === 1){
+        aExpression = 0;
+        bExpression = fullExpression.slice(operatorPosition[0]+1);
+        currentOperator = firstChar;
+        return;
+    }
+    // check for negative sign 
+    if (operatorPosition[0] === 0  && operatorPosition.length > 1){
+        aExpression = fullExpression.slice(0,operatorPosition[1]);
+        bExpression = fullExpression.slice(operatorPosition[1]+1);
+        return;
+    }
+    if (operatorPosition.length === 1){
+        aExpression = fullExpression.slice(0,operatorPosition[0]);
+        bExpression = fullExpression.slice(operatorPosition[0]+1);
+        return;
+    }
+    // regular single operator evaluation  
+    
 }
 
 //special operations
@@ -159,16 +194,4 @@ function del(string){
     inputDisplay.innerText = string.slice(0, -1);
     return;
 }
-function percent(){
-    if (inputDisplay.innerHTML !== ""
-        && !inputDisplay.innerHTML.includes('/+|-|x|÷/')){
-        addInput('÷100'); 
-        }
-         
-    }
-
-
-
-
-
 
