@@ -114,7 +114,7 @@ function operation(e){
     currentOperator = e;
     addInput(e);
 }
-
+console.log('hello')
 function addInput(e) {
     if(inputDisplay.innerText.length > 25)
         console.log ('error');
