@@ -1,4 +1,12 @@
-
+const plus = '+';
+const minus = '-';
+const times = 'x';
+const dividedBy = '÷'; 
+const percent = '%';
+const ops = /\+|-|x|÷/g;
+const symbols = /\+|-|x|÷|%/g;
+const pointReg = /\./g;
+const zeroErrorMessage = `error: divide by 0`;
 
 // displays 
 const inputDisplay = document.querySelector('#user-input-display');
@@ -10,19 +18,18 @@ let aExpression;
 let bExpression;
 let firstChar;
 
+let thereIsSymbol;
+let lastIsSymbol;
+let thereIsPoint;
+function lastIs(e){
+    return (inputDisplay.innerText.slice(-1).match(e) || []).length;
+} 
+function matchWith(e){
+    return (inputDisplay.innerText.match(e) || []).length
+}
 
-const plus = '+';
-const minus = '-';
-const times = 'x';
-const dividedBy = '÷'; 
-// const ops = '[/+]|x|-|÷';
-const ops = /\+|-|x|÷/g;
-const opArraytions = ['+', '-', 'x', '÷'];
-const zeroErrorMessage = `ERROR, divide by zero`;
-
-
-  
 // numbers 
+
 const oneButton = document.querySelector('#one');
     oneButton.addEventListener('click', () => addInput(1));
 const twoButton = document.querySelector('#two');
@@ -48,7 +55,7 @@ const zeroButton = document.querySelector('#zero');
 const deleteButton = document.querySelector('#del');
     deleteButton.addEventListener('click', ()=> del(inputDisplay.innerText))
 const percentButton = document.querySelector('#percent');
-    percentButton.addEventListener('click', ()=> operation('%'));
+    percentButton.addEventListener('click', ()=> addInput(percent));
     
 const clearButton = document.querySelector('#ac');
     clearButton.addEventListener('click', ()=> {
@@ -78,7 +85,6 @@ const addButton = document.querySelector('#add');
     addButton.addEventListener('click', ()=> operation(plus));
 
 
-         
 
 // calculations 
 function round(num){
@@ -87,149 +93,150 @@ function round(num){
 
 function sum(a, b){
     let theSum = Number(a) + Number(b);
-    return round(theSum)
-        
-        
+    return round(theSum) 
 }
 function difference(a, b){
     let theDifference = Number(a) - Number(b);
     return round(theDifference);
 }
-
 function product (a,b){
     let theProduct = Number(a) * Number(b);
     return round(theProduct);
 }
 function quotient (a,b){
-    if (b === '0') return zeroErrorMessage;
+    if (b == 0) return zeroErrorMessage;
     
     else{ let theQuotient = Number(a) / Number(b);
         return round(theQuotient);
+    }
 }
-}
-
 
 function operation(e){
     // evaluate last function, if any 
-    calculate();
+    calculate(e);
     // reassign new operation if any 
     currentOperator = e;
     addInput(e);
+        
 }
 
 function addInput(e) {
-    if(inputDisplay.innerText.length > 25)
-        console.log ('error');
+    // check for overflow or error 
+    if(inputDisplay.innerText.length > 11 
+        || inputDisplay.innerText.includes(zeroErrorMessage)) return;
+
+    // special cases
+    else if (e === percent) addPercent();
+    else if (e === '.') addPoint();
+    else if (inputDisplay.innerText === '0') inputDisplay.innerText = e;
+
+    // normal cases: append input 
+    else if (lastIs(percent) === 0) inputDisplay.innerText += e;
     
-    // if (e === '%' 
-    //     && (inputDisplay.innerHTML !== ""
-    //     || !inputDisplay.innerHTML.includes('/+|-|x|÷|%/'))
-    //     ){
-    //         console.log(inputDisplay.innerText);
-    //         console.log(bExpression);
-    //     return;
-    // }
-
-    // Check for zero 
-    // check for dot
-    if(e === '.'){
-        addPoint();
-        return;
-    }
-    if(inputDisplay.innerText === '0'){
-        inputDisplay.innerText = e;
-        return;
-    }
-    // append selected input 
-    else{
-        inputDisplay.innerText += e;
-        return;
-    }
 }
+function addPercent(){
+    // check if empty 
+    if (inputDisplay.innerText === ''){
+        // console.log('no expression');
+    
+    // check if not empty, and last is a symbol
+    }else if (inputDisplay.innerText !== ''
+        && lastIs(symbols)){
+        // console.log ('not empty, last is a symbol')
 
+    // check if not empty and last character is not a symbol
+    }else if (inputDisplay.innerText !== ''
+        && !lastIs(symbols)){
+        inputDisplay.innerText += '%';
+        // console.log('not empty, and last character is not symbol')
+    }
+
+}
 function addPoint(){
-    let thereIsSymbol = (inputDisplay.innerText.match(ops) || []).length;
-    let lastIsSymbol = (inputDisplay.innerText.slice(-1).match(ops) || []).length;
-    let thereIsPoint = (inputDisplay.innerText.match(/\./g) || []).length;
     // check if empty 
     if (inputDisplay.innerText.length === 0){
         inputDisplay.innerText = '0.';
-        console.log('empty')
-        return;
 
     // check no symbol, single point
-    }else if(thereIsSymbol === 0
-        && thereIsPoint > 0 && thereIsPoint < 2){
-        console.log('no symbol, single point')
+    }else if(!matchWith(symbols)
+        && matchWith(pointReg) === 1){
         return;
     
-    // check for symbol, last is a symbol, and a single point 
-    }else if (thereIsSymbol === 1
-        && lastIsSymbol === 1
-        && thereIsPoint > 0 && thereIsPoint < 2){
+    // check single symbol, last is percent
+    }else if(matchWith(symbols)
+        && lastIs(percent)){
+        return;
+
+    // check single symbol, for last is operation
+    }else if (matchWith(symbols) === 1 && lastIs(ops) === 1){
         inputDisplay.innerText += '0.';
-        console.log('symbol, last is symbol, single point')
-        return;
+
     // check for symbol, last is not a symbol, and a single point
-    }else if(thereIsSymbol === 1
-        && lastIsSymbol === 0
-        && thereIsPoint > 0 && thereIsPoint < 2){
+    }else if(matchWith(symbols) === 1
+        && !lastIs(symbols)
+        && matchWith(pointReg) === 1){
         inputDisplay.innerText += '.';
-        console.log('symbol, last is not symbol, single point')
+        
     // check for symbol, last is not a symbol, and two points
-    }else if(thereIsSymbol === 1
-        && lastIsSymbol === 0
-        && thereIsPoint === 2){
-        console.log('symbol, last not symbol, 2 points')
+    }else if(matchWith(symbols)
+        && !lastIs(ops)
+        && matchWith(pointReg) === 2){
         return;
-    }else {
-        inputDisplay.innerText += '.';
-        console.log('else we add .')
-    } 
-} 
-    
+
+    }else{
+        console.log(`matching . ${matchWith(pointReg)}`)
+        inputDisplay.innerText += '.';        
+    }
+}
 
 function calculate(){
-    const operatorPosition = [];
+    if (inputDisplay.innerText.includes(zeroErrorMessage)) return;
+
     if (inputDisplay.innerText.length < 1) {
         return};
     
-    if (currentOperator ==='%'
-        && (inputDisplay.innerHTML !== ""
-        || !inputDisplay.innerHTML.includes('/+|-|x|÷|%/'))){
+    assignExpressions(inputDisplay.innerText);
+    // case of % with no operation 
+    if (!matchWith(ops) && lastIs(percent)){
+        percentof = inputDisplay.innerText.slice(0,-1)
+        inputDisplay.innerText = quotient(percentof, 100)
 
-        return;
-    }
-    if (currentOperator === '%'){
-            inputDisplay.innerText = product(inputDisplay.innerText.slice(0,-1), 0.01);
+    }else{ 
+        if (currentOperator === minus){
+            inputDisplay.innerText = difference(aExpression, bExpression);
             return;
         }
-    assignExpressions(inputDisplay.innerText);
+        if (currentOperator === plus){
+            inputDisplay.innerText = sum(aExpression,bExpression);
+            return;
+        }
+        if (currentOperator === dividedBy){
+            inputDisplay.innerText = quotient(aExpression,bExpression);
+            return;
+        }
+        if (currentOperator === times){
+            inputDisplay.innerText = product(aExpression,bExpression);
+            return;
+        }
     
-    if (currentOperator === minus){
-        inputDisplay.innerText = difference(aExpression, bExpression);
-        return;
-    }
-    if (currentOperator === plus){
-        inputDisplay.innerText = sum(aExpression,bExpression);
-        return;
-    }
-    if (currentOperator === dividedBy){
-        inputDisplay.innerText = quotient(aExpression,bExpression);
-        return;
-    }
-    if (currentOperator === times){
-        inputDisplay.innerText = product(aExpression,bExpression);
-        return;
-    }
-    
+}
 }
 
 function assignExpressions(fullExpression){
+
+    let operatorPosition = [];
     // create an array that matches operators in the expresssion and maps their indexes 
     operatorPosition = [...fullExpression.matchAll(ops)].map(a => a.index);
     let firstChar = fullExpression.slice(0,1);
 
+    
+    //case of operation and last character is %
+    if (matchWith(ops)
+        && lastIs(percent)){
+        aExpression = fullExpression.slice(0,operatorPosition[0]);
+        bExpression = (fullExpression.slice(operatorPosition[0]+1, -1)) * 0.01;
+        return
+    }
     // case of only negative number, single operand
     if (operatorPosition[0] === 0  && operatorPosition.length === 1){
         aExpression = 0;
@@ -254,7 +261,10 @@ function assignExpressions(fullExpression){
 
 //special operations
 function del(string){
+    if (inputDisplay.innerText.includes(zeroErrorMessage)) return;
+
     inputDisplay.innerText = string.slice(0, -1);
     return;
 }
+
 
