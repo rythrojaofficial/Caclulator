@@ -63,7 +63,10 @@ const clearButton = document.querySelector('#ac');
         currentOperator = undefined;
     })
 const equalsButton = document.querySelector('#equals');
-    equalsButton.addEventListener('click', calculate);
+    equalsButton.addEventListener('click', ()=> {
+        calculate()
+        currentOperator = undefined;
+    })
 
 const parenthesisButton = document.querySelector('#parenthesis');
 const dotButton = document.querySelector('#dot');
@@ -110,7 +113,7 @@ function quotient (a,b){
 
 function operation(e){
     // evaluate last function, if any 
-    calculate(e);
+    calculate();
     // reassign new operation if any 
     currentOperator = e;
     addInput(e);
@@ -125,10 +128,11 @@ function addInput(e) {
     // special cases
     else if (e === percent) addPercent();
     else if (e === '.') addPoint();
-    else if (inputDisplay.innerText === '0') inputDisplay.innerText = e;
+    // else if (inputDisplay.innerText === '0') inputDisplay.innerText = e;
 
     // normal cases: append input 
-    else if (lastIs(percent) === 0) inputDisplay.innerText += e;
+    else if (lastIs(percent) === 1) return;
+    else inputDisplay.innerText += e;
     
 }
 function addPercent(){
