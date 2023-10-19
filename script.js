@@ -6,7 +6,7 @@ const percent = '%';
 const ops = /\+|-|x|÷/g;
 const symbols = /\+|-|x|÷|%/g;
 const pointReg = /\./g;
-const zeroErrorMessage = `error: divide by 0`;
+const zeroErrorMessage = `error: ÷ 0`;
 
 // displays 
 const inputDisplay = document.querySelector('#user-input-display');
@@ -196,7 +196,7 @@ function calculate(){
     assignExpressions(inputDisplay.innerText);
     // case of % with no operation 
     if (!matchWith(ops) && lastIs(percent)){
-        percentof = inputDisplay.innerText.slice(0,-1)
+        let percentof = inputDisplay.innerText.slice(0,-1)
         inputDisplay.innerText = quotient(percentof, 100)
 
     }else if(currentOperator === minus){
