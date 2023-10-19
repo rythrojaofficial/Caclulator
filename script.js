@@ -61,8 +61,8 @@ const clearButton = document.querySelector('#ac');
     clearButton.addEventListener('click', ()=> {
         inputDisplay.innerText = "";
         calculationDisplay.innerText = "";
-        aExpression = 0;
-        bExpression = 0;
+        aExpression = undefined;
+        bExpression = undefined;
         currentOperator = undefined;
     })
 const equalsButton = document.querySelector('#equals');
@@ -191,9 +191,7 @@ function addPoint(){
 
 function calculate(){
     if (inputDisplay.innerText.includes(zeroErrorMessage)) return;
-
-    if (inputDisplay.innerText.length < 1) {
-        return};
+    if (inputDisplay.innerText.length < 1) return;
     
     assignExpressions(inputDisplay.innerText);
     // case of % with no operation 
@@ -201,26 +199,22 @@ function calculate(){
         percentof = inputDisplay.innerText.slice(0,-1)
         inputDisplay.innerText = quotient(percentof, 100)
 
-    }else{ 
-        if (currentOperator === minus){
+    }else if(currentOperator === minus){
             inputDisplay.innerText = difference(aExpression, bExpression);
             return;
-        }
-        if (currentOperator === plus){
+    }else if (currentOperator === plus){
             inputDisplay.innerText = sum(aExpression,bExpression);
             return;
-        }
-        if (currentOperator === dividedBy){
+    }else if (currentOperator === dividedBy){
             inputDisplay.innerText = quotient(aExpression,bExpression);
             return;
-        }
-        if (currentOperator === times){
+    }else if (currentOperator === times){
             inputDisplay.innerText = product(aExpression,bExpression);
             return;
         }
     
 }
-}
+
 
 function assignExpressions(fullExpression){
 
