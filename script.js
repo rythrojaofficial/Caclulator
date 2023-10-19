@@ -60,9 +60,6 @@ const percentButton = document.querySelector('#percent');
 const clearButton = document.querySelector('#ac');
     clearButton.addEventListener('click', ()=> {
         inputDisplay.innerText = "";
-        calculationDisplay.innerText = "";
-        aExpression = undefined;
-        bExpression = undefined;
         currentOperator = undefined;
     })
 const equalsButton = document.querySelector('#equals');
